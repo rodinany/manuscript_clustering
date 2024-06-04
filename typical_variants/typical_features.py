@@ -45,27 +45,24 @@ def colour_features(features, clusters, variants_df):
     return variants_sf
 
 
-df = pd.read_excel(os.path.join(os.getcwd(), '..', 'matrixes_no_F.п.I.6.xlsx'), sheet_name='full_variants_matrix')
+df = pd.read_excel(os.path.join(os.getcwd(), '..', 'matrixes_no_F.п.I.6.xlsx'),
+                   sheet_name='full_variants_matrix')
 variant_units_df = df.iloc[:, 0]
 variants_df = df.iloc[:, 1:-6]
 
-# clusters = [[]]
-# with open(os.path.join(os.getcwd(), '..', 'clusters.txt'), encoding='utf-8') as file:
-#     for line in file:
-#         if line != '\n':
-#             clusters[-1].append(line.split())
-#         else:
-#             clusters.append([])
-
-# ordered_mss = [ms for main_cluster in clusters for small_cluster in main_cluster for ms in small_cluster]
-# main_clusters = [[ms for small_cluster in main_cluster for ms in small_cluster] for main_cluster in clusters]
-# small_clusters = [small_cluster for main_cluster in clusters for small_cluster in main_cluster]
-
-main_clusters = []
-with open(os.path.join(os.getcwd(), '..', 'clusters_full.txt'), encoding='utf-8') as file:
+clusters = [[]]
+with open(os.path.join(os.getcwd(), '..', 'clusters.txt'), encoding='utf-8') as file:
     for line in file:
-        main_clusters.append(line.strip('\n').split(' '))
-ordered_mss = [ms for cluster in main_clusters for ms in cluster]
+        if line != '\n':
+            clusters[-1].append(line.split())
+        else:
+            clusters.append([])
+
+ordered_mss = [ms for main_cluster in clusters for small_cluster in main_cluster for ms in small_cluster]
+main_clusters = [[ms for small_cluster in main_cluster for ms in small_cluster] for main_cluster in clusters]
+small_clusters = [small_cluster for main_cluster in clusters for small_cluster in main_cluster]
+
+
 
 variants_df = variants_df[ordered_mss]
 features_indexes = set()
@@ -79,9 +76,9 @@ features_indexes = features_indexes.union(set(mc_features_indexes))
 mc_variants_sf = colour_features(mc_features, main_clusters, variants_df)
 print(mc_features)
 
-# with sf.StyleFrame.ExcelWriter('all_features_no_F.п.I.6.xlsx') as writer:
-#     mc_variants_sf.to_excel(writer, sheet_name='main_clusters')
-#
+with sf.StyleFrame.ExcelWriter('all_features.xlsx') as writer:
+    mc_variants_sf.to_excel(writer, sheet_name='main_clusters')
+
 for i in mc_features:
     mc_features_df = variants_df[main_clusters[i]].iloc[mc_features[i]]
     mc_features_df = pd.merge(variant_units_df, mc_features_df, left_index=True, right_index=True)
@@ -92,28 +89,28 @@ for i in mc_features:
         with pd.ExcelWriter('mc_features.xlsx', mode='a') as writer:
             mc_features_df.to_excel(writer, sheet_name=f'{i+1}_cluster')
 
-# sc_variants_percents = variants_percentage(small_clusters, variants_df)
-# sc_features = typical_features(sc_variants_percents)
-# mc_features_indexes = []
-# for value in sc_features.values():
-#     mc_features_indexes.extend(value)
-# features_indexes = features_indexes.union(set(mc_features_indexes))
-# sc_variants_sf = colour_features(sc_features, small_clusters, variants_df)
+sc_variants_percents = variants_percentage(small_clusters, variants_df)
+sc_features = typical_features(sc_variants_percents)
+mc_features_indexes = []
+for value in sc_features.values():
+    mc_features_indexes.extend(value)
+features_indexes = features_indexes.union(set(mc_features_indexes))
+sc_variants_sf = colour_features(sc_features, small_clusters, variants_df)
 
-# with sf.StyleFrame.ExcelWriter('all_features_no_F.п.I.6.xlsx', mode='a') as writer:
-#     sc_variants_sf.to_excel(writer, sheet_name='small_clusters')
-#
-# for i in sc_features:
-#     sc_features_df = variants_df[small_clusters[i]].iloc[sc_features[i]]
-#     sc_features_df = pd.merge(variant_units_df, sc_features_df, left_index=True, right_index=True)
-#     if i == 0:
-#         with pd.ExcelWriter('sc_features_no_F.п.I.6.xlsx') as writer:
-#             sc_features_df.to_excel(writer, sheet_name=f'{small_clusters[i][0]}_{small_clusters[i][-1]}')
-#     else:
-#         with pd.ExcelWriter('sc_features_no_F.п.I.6.xlsx', mode='a') as writer:
-#             sc_features_df.to_excel(writer, sheet_name=f'{small_clusters[i][0]}_{small_clusters[i][-1]}')
+with sf.StyleFrame.ExcelWriter('all_features.xlsx', mode='a') as writer:
+    sc_variants_sf.to_excel(writer, sheet_name='small_clusters')
+
+for i in sc_features:
+    sc_features_df = variants_df[small_clusters[i]].iloc[sc_features[i]]
+    sc_features_df = pd.merge(variant_units_df, sc_features_df, left_index=True, right_index=True)
+    if i == 0:
+        with pd.ExcelWriter('sc_features.xlsx') as writer:
+            sc_features_df.to_excel(writer, sheet_name=f'{small_clusters[i][0]}_{small_clusters[i][-1]}')
+    else:
+        with pd.ExcelWriter('sc_features.xlsx', mode='a') as writer:
+            sc_features_df.to_excel(writer, sheet_name=f'{small_clusters[i][0]}_{small_clusters[i][-1]}')
 
 features_indexes = list(features_indexes)
 features_indexes.sort()
-# with open('features_indexes.txt', 'w') as file:
-#     file.write(' '.join(str(index) for index in features_indexes))
+with open('features_indexes.txt', 'w') as file:
+    file.write(' '.join(str(index) for index in features_indexes))

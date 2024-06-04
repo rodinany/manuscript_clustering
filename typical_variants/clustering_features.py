@@ -87,5 +87,5 @@ sorted_df.columns = [similarity_df.columns[i] for i in clusters]
 sorted_df.index = [similarity_df.columns[i] for i in clusters]
 
 # writing down an ordened and clustered similarity matrix
-# with pd.ExcelWriter('clustering_by_features.xlsx') as writer:
-#     sorted_df.to_excel(writer, sheet_name='similarity_matrix_clustered')
+with pd.ExcelWriter('clustering_by_features.xlsx') as writer:
+    sorted_df.to_excel(writer, sheet_name='similarity_matrix_clustered')

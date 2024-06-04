@@ -17,7 +17,6 @@ for percent in similarity_percents:
     manuscripts_pairs.extend(manuscripts)
 
 clusters = []
-# в этом множестве содержатся номера всех рукописей, которые уже находятся в каком-либо из кластеров
 clustered_ms = set()
 
 for pair in manuscripts_pairs:
@@ -57,5 +56,5 @@ sorted_df.columns = [similarity_df.columns[i] for i in clusters]
 sorted_df.index = [similarity_df.columns[i] for i in clusters]
 
 # writing down an ordened and clustered similarity matrix
-# with pd.ExcelWriter('matrixes_no_F.п.I.6.xlsx', mode='a') as writer:
-#     sorted_df.to_excel(writer, sheet_name='similarity_matrix_ordened')
+with pd.ExcelWriter('matrixes_no_F.п.I.6.xlsx', mode='a') as writer:
+    sorted_df.to_excel(writer, sheet_name='similarity_matrix_ordened')
